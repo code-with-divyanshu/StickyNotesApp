@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Trash from "../icons/Trash";
+import { autoGrow, setNewOffset, setZIndex } from "../utils";
 
 const NoteCard = ({ note }) => {
   const body = JSON.parse(note.body);
@@ -15,13 +16,8 @@ const NoteCard = ({ note }) => {
     autoGrow(textAreaRef);
   }, []);
 
-  const autoGrow = (textAreaRef) => {
-    const { current } = textAreaRef;
-    current.style.height = "auto"; // Reset the height
-    current.style.height = current.scrollHeight + "px";
-  };
-
   const mouseDown = (e) => {
+    setZIndex(cardRef.current);
     mouseStartPos.x = e.clientX;
     mouseStartPos.y = e.clientY;
 
@@ -38,10 +34,9 @@ const NoteCard = ({ note }) => {
     mouseStartPos.x = e.clientX;
     mouseStartPos.y = e.clientY;
 
-    setPosition({
-      x: cardRef.current.offsetLeft - mouseMoveDir.x,
-      y: cardRef.current.offsetTop - mouseMoveDir.y,
-    });
+    const newPosition = setNewOffset(cardRef.current, mouseMoveDir);
+
+    setPosition(newPosition);
   };
 
   const mouseUp = () => {
@@ -73,6 +68,9 @@ const NoteCard = ({ note }) => {
           defaultValue={body}
           onInput={() => {
             autoGrow(textAreaRef);
+          }}
+          onFocus={() => {
+            setZIndex(cardRef.current);
           }}
         ></textarea>
       </div>
